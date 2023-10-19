@@ -1,4 +1,4 @@
-**Outdoor Hazard Detection** is a dataset for a cell wise segmentation task. It is used in the internet of things domain. 
+**Outdoor Hazard Detection** is a dataset for a cell wise segmentation task. It is used in the smart city and safety industries. 
 
 The dataset consists of 20380 images with 394100 labeled objects belonging to 11 different classes including *bump*, *weed*, *vehicle*, and other: *column*, *creature*, *wall*, *dent*, *zebracrossing*, *fence*, *trafficsign*, and *trafficcone*.
 
