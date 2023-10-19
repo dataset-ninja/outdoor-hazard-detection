@@ -1,9 +1,10 @@
 import supervisely as sly
 import os
+import xml.etree.ElementTree as ET
 from dataset_tools.convert import unpack_if_archive
 import src.settings as s
 from urllib.parse import unquote, urlparse
-from supervisely.io.fs import get_file_name, get_file_size
+from supervisely.io.fs import get_file_name, file_exists
 import shutil
 
 from tqdm import tqdm
@@ -69,17 +70,88 @@ def count_files(path, extension):
 def convert_and_upload_supervisely_project(
     api: sly.Api, workspace_id: int, project_name: str
 ) -> sly.ProjectInfo:
-    ### Function should read local dataset and upload it to Supervisely project, then return project info.###
-    raise NotImplementedError("The converter should be implemented manually.")
-
-    # dataset_path = "/local/path/to/your/dataset" # general way
-    # dataset_path = download_dataset(teamfiles_dir) # for large datasets stored on instance
-
-    # ... some code here ...
-
-    # sly.logger.info('Deleting temporary app storage files...')
-    # shutil.rmtree(storage_dir)
-
-    # return project
+    dataset_path = "archive"
+    images_path = "archive/RGB"
+    bboxes_path = "archive/yolic_xml"
+    images_ext = ".png"
+    bboxes_ext = ".xml"
+    split_ext = ".txt"
+    batch_size = 30
 
 
+    def create_ann(image_path):
+        labels = []
+
+        file_name = get_file_name(image_path)
+
+        ann_path = os.path.join(bboxes_path, file_name + bboxes_ext)
+
+        if file_exists(ann_path):
+            tree = ET.parse(ann_path)
+            root = tree.getroot()
+
+            img_height = int(root.find(".//height").text)
+            img_wight = int(root.find(".//width").text)
+
+            objects = root.findall(".//object")
+            for curr_obj in objects:
+                name = curr_obj.find(".//name").text
+                obj_class = meta.get_obj_class(name)
+                curr_coord = curr_obj.find(".//bndbox")
+                left = int(curr_coord[0].text)
+                top = int(curr_coord[1].text)
+                right = int(curr_coord[2].text)
+                bottom = int(curr_coord[3].text)
+
+                rect = sly.Rectangle(left=left, top=top, right=right, bottom=bottom)
+                label = sly.Label(rect, obj_class)
+                labels.append(label)
+
+        return sly.Annotation(img_size=(img_height, img_wight), labels=labels)
+
+
+    project = api.project.create(workspace_id, project_name, change_name_if_conflict=True)
+
+    meta = sly.ProjectMeta()
+
+    for class_name in [
+        "Bump",
+        "Weed",
+        "Column",
+        "Fence",
+        "Dent",
+        "Vehicle",
+        "Wall",
+        "Creature",
+        "ZebraCrossing",
+        "TrafficSign",
+        "TrafficCone",
+    ]:
+        obj_class = sly.ObjClass(class_name, sly.Rectangle)
+        meta = meta.add_obj_class(obj_class)
+
+    api.project.update_meta(project.id, meta.to_json())
+
+    for ds_name in ["train", "val", "test"]:
+        split_path = os.path.join(dataset_path, ds_name + split_ext)
+        with open(split_path) as f:
+            content = f.read().split("\n")
+
+        dataset = api.dataset.create(project.id, ds_name, change_name_if_conflict=True)
+
+        images_names = [im_name + images_ext for im_name in content if len(im_name) > 0]
+
+        progress = sly.Progress("Create dataset {}".format(ds_name), len(images_names))
+
+        for images_names_batch in sly.batched(images_names, batch_size=batch_size):
+            images_pathes_batch = [os.path.join(images_path, im_name) for im_name in images_names_batch]
+
+            img_infos = api.image.upload_paths(dataset.id, images_names_batch, images_pathes_batch)
+            img_ids = [im_info.id for im_info in img_infos]
+
+            anns = [create_ann(image_path) for image_path in images_pathes_batch]
+            api.annotation.upload_anns(img_ids, anns)
+
+            progress.iters_done_report(len(images_names_batch))
+
+    return project
