@@ -24,7 +24,7 @@ LICENSE: License = License.DbCL_1_0()
 APPLICATIONS: List[Union[Industry, Domain, Research]] = [Industry.SmartCity(),Industry.Safety()]
 CATEGORY: Category = Category.Safety(extra=Category.Surveillance())
 
-CV_TASKS: List[CVTask] = [CVTask.ObjectDetection()]
+CV_TASKS: List[CVTask] = [CVTask.CellWiseSegmentation()]
 ANNOTATION_TYPES: List[AnnotationType] = [AnnotationType.ObjectDetection()]
 
 RELEASE_DATE: Optional[str] = "2023-07-30"  # e.g. "YYYY-MM-DD"
