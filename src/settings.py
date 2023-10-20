@@ -21,7 +21,7 @@ HIDE_DATASET = False  # set False when 100% sure about repo quality
 # * After uploading to instance ##
 ##################################
 LICENSE: License = License.DbCL_1_0()
-APPLICATIONS: List[Union[Industry, Domain, Research]] = [Industry.SmartCity(),Industry.Safety()]
+APPLICATIONS: List[Union[Industry, Domain, Research]] = [Domain.IoT()]
 CATEGORY: Category = Category.Surveillance(extra=Category.Robotics)
 
 CV_TASKS: List[CVTask] = [CVTask.CellWiseSegmentation()]
