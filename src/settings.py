@@ -22,7 +22,7 @@ HIDE_DATASET = False  # set False when 100% sure about repo quality
 ##################################
 LICENSE: License = License.DbCL_1_0()
 APPLICATIONS: List[Union[Industry, Domain, Research]] = [Industry.SmartCity(),Industry.Safety()]
-CATEGORY: Category = Category.Surveillance()
+CATEGORY: Category = Category.Surveillance(extra=Category.Robotics)
 
 CV_TASKS: List[CVTask] = [CVTask.CellWiseSegmentation()]
 ANNOTATION_TYPES: List[AnnotationType] = [AnnotationType.ObjectDetection()]
