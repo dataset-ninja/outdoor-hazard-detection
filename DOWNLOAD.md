@@ -1,6 +1,6 @@
 Dataset **Outdoor Hazard Detection** can be downloaded in [Supervisely format](https://developer.supervisely.com/api-references/supervisely-annotation-json-format):
 
- [Download](https://www.dropbox.com/scl/fi/tcjnnsmzibf8khi2hg1zc/outdoor-hazard-detection-DatasetNinja.tar?rlkey=n8mmtowj2jc29j5ygx71fls5i&dl=1)
+ [Download](https://assets.supervisely.com/remote/eyJsaW5rIjogImZzOi8vYXNzZXRzLzI3ODlfT3V0ZG9vciBIYXphcmQgRGV0ZWN0aW9uL291dGRvb3ItaGF6YXJkLWRldGVjdGlvbi1EYXRhc2V0TmluamEudGFyIiwgInNpZyI6ICJhTzZ4Y2dRbFBBZmYrSGtZaUJlbEZtY0lXM3NVSjNnV0swdzRYSlhuU0FzPSJ9)
 
 As an alternative, it can be downloaded with *dataset-tools* package:
 ``` bash
